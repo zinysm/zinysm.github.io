@@ -169,6 +169,26 @@
             background: #2a2a4a;
         }
         
+        .editor-table tr.dragging {
+            opacity: 0.5;
+            background: #667eea;
+        }
+        
+        .editor-table tr.drag-over {
+            border-top: 3px solid #667eea;
+        }
+        
+        .drag-handle {
+            cursor: grab;
+            font-size: 18px;
+            user-select: none;
+            padding: 5px 10px;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
         .editor-table tr.section-row {
             background: #1a1a2e;
         }
@@ -570,7 +590,7 @@
                 <table class="editor-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px;">↕️</th>
+                            <th style="width: 40px;"></th>
                             <th style="width: 250px;">Užduotis</th>
                             <th style="width: 100px;">Tipas</th>
                             <th style="width: 110px;">Pradžia</th>
@@ -713,11 +733,48 @@
             
             tasks.forEach((task, index) => {
                 const tr = document.createElement('tr');
+                tr.draggable = true;
+                tr.dataset.index = index;
+                
+                // Drag events
+                tr.addEventListener('dragstart', (e) => {
+                    tr.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', index);
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                tr.addEventListener('dragend', () => {
+                    tr.classList.remove('dragging');
+                    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                });
+                
+                tr.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    tr.classList.add('drag-over');
+                });
+                
+                tr.addEventListener('dragleave', () => {
+                    tr.classList.remove('drag-over');
+                });
+                
+                tr.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    tr.classList.remove('drag-over');
+                    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const toIndex = index;
+                    if (fromIndex !== toIndex) {
+                        const item = tasks.splice(fromIndex, 1)[0];
+                        tasks.splice(toIndex, 0, item);
+                        saveToStorage();
+                        renderEditor();
+                    }
+                });
                 
                 if (task.type === 'section') {
                     tr.className = 'section-row';
                     tr.innerHTML = `
-                        <td>☰</td>
+                        <td class="drag-handle">☰</td>
                         <td colspan="5">
                             <input type="text" value="${task.name}" onchange="updateTask(${index}, 'name', this.value)">
                         </td>
@@ -733,7 +790,7 @@
                     const endDate = addDays(projectStart, task.startDay + task.duration);
                     
                     tr.innerHTML = `
-                        <td style="cursor: grab;" draggable="true" ondragstart="dragStart(event, ${index})" ondragover="dragOver(event)" ondrop="drop(event, ${index})">☰</td>
+                        <td class="drag-handle">☰</td>
                         <td><input type="text" value="${task.name}" onchange="updateTask(${index}, 'name', this.value)"></td>
                         <td>
                             <select onchange="updateTask(${index}, 'category', this.value)">
@@ -748,8 +805,6 @@
                         <td><input type="text" value="${task.note || ''}" onchange="updateTask(${index}, 'note', this.value)" placeholder="Pastaba..."></td>
                         <td>
                             <div class="row-actions">
-                                <button class="btn btn-secondary btn-small" onclick="moveTask(${index}, -1)">⬆️</button>
-                                <button class="btn btn-secondary btn-small" onclick="moveTask(${index}, 1)">⬇️</button>
                                 <button class="btn btn-danger btn-small" onclick="deleteTask(${index})">🗑️</button>
                             </div>
                         </td>
@@ -800,41 +855,6 @@
                 saveToStorage();
                 renderEditor();
             }
-        }
-        
-        function moveTask(index, direction) {
-            const newIndex = index + direction;
-            if (newIndex < 0 || newIndex >= tasks.length) return;
-            
-            const temp = tasks[index];
-            tasks[index] = tasks[newIndex];
-            tasks[newIndex] = temp;
-            saveToStorage();
-            renderEditor();
-        }
-        
-        // Drag and drop
-        let draggedIndex = null;
-        
-        function dragStart(e, index) {
-            draggedIndex = index;
-            e.dataTransfer.effectAllowed = 'move';
-        }
-        
-        function dragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        }
-        
-        function drop(e, targetIndex) {
-            e.preventDefault();
-            if (draggedIndex === null || draggedIndex === targetIndex) return;
-            
-            const item = tasks.splice(draggedIndex, 1)[0];
-            tasks.splice(targetIndex, 0, item);
-            draggedIndex = null;
-            saveToStorage();
-            renderEditor();
         }
         
         // Gantt rendering
