@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Renovacijos Master Planas - Kerų Kerai</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -19,451 +15,170 @@
             min-height: 100vh;
         }
         
-        h1 {
-            text-align: center;
-            margin-bottom: 5px;
-            color: #fff;
-            font-size: 24px;
-        }
+        h1 { text-align: center; margin-bottom: 5px; color: #fff; font-size: 24px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 14px; }
         
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
         .tab {
-            padding: 10px 25px;
-            background: #252545;
-            border: none;
-            color: #aaa;
-            cursor: pointer;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.2s;
+            padding: 10px 25px; background: #252545; border: none; color: #aaa;
+            cursor: pointer; border-radius: 8px; font-size: 14px; transition: all 0.2s;
         }
+        .tab:hover { background: #353565; }
+        .tab.active { background: #667eea; color: #fff; }
         
-        .tab:hover {
-            background: #353565;
-        }
+        .view { display: none; }
+        .view.active { display: block; }
         
-        .tab.active {
-            background: #667eea;
-            color: #fff;
-        }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: #fff; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #27ae60; color: #fff; }
+        .btn-success:hover { background: #219a52; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: #555; color: #fff; }
+        .btn-secondary:hover { background: #666; }
+        .btn-small { padding: 4px 8px; font-size: 11px; }
         
-        .view {
-            display: none;
-        }
-        
-        .view.active {
-            display: block;
-        }
-        
-        /* Editor styles */
-        .editor-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-        
-        .btn-primary {
-            background: #667eea;
-            color: #fff;
-        }
-        
-        .btn-primary:hover {
-            background: #5a6fd6;
-        }
-        
-        .btn-success {
-            background: #27ae60;
-            color: #fff;
-        }
-        
-        .btn-success:hover {
-            background: #219a52;
-        }
-        
-        .btn-danger {
-            background: #e74c3c;
-            color: #fff;
-        }
-        
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-        
-        .btn-secondary {
-            background: #555;
-            color: #fff;
-        }
-        
-        .btn-secondary:hover {
-            background: #666;
-        }
-        
+        .editor-container { max-width: 1400px; margin: 0 auto; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
         .start-date-input {
-            padding: 8px 12px;
-            border: 1px solid #444;
-            border-radius: 6px;
-            background: #252545;
-            color: #fff;
-            font-size: 13px;
+            padding: 8px 12px; border: 1px solid #444; border-radius: 6px;
+            background: #252545; color: #fff; font-size: 13px;
         }
         
-        .editor-table-wrapper {
-            overflow-x: auto;
-            background: #252545;
-            border-radius: 8px;
-        }
-        
-        .editor-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-        }
-        
+        .editor-table-wrapper { overflow-x: auto; background: #252545; border-radius: 8px; }
+        .editor-table { width: 100%; border-collapse: collapse; min-width: 1050px; }
         .editor-table th {
-            background: #3a3a5a;
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 600;
-            color: #fff;
-            position: sticky;
-            top: 0;
+            background: #3a3a5a; padding: 12px 10px; text-align: left;
+            font-size: 12px; font-weight: 600; color: #fff; position: sticky; top: 0; z-index: 2;
         }
+        .editor-table td { padding: 8px 10px; border-bottom: 1px solid #333; font-size: 13px; vertical-align: top; }
+        .editor-table tr:hover { background: #2a2a4a; }
+        .editor-table tr.completed-row { opacity: 0.5; }
+        .editor-table tr.completed-row .task-name-input { text-decoration: line-through; color: #1abc9c; }
+        .editor-table tr.dragging { opacity: 0.5; background: #667eea; }
+        .editor-table tr.drag-over { border-top: 3px solid #667eea; }
         
-        .editor-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #333;
-            font-size: 13px;
-        }
+        .drag-handle { cursor: grab; font-size: 18px; user-select: none; padding: 5px 10px; }
+        .drag-handle:active { cursor: grabbing; }
         
-        .editor-table tr:hover {
-            background: #2a2a4a;
-        }
-        
-        .editor-table tr.completed-row {
-            opacity: 0.55;
-        }
-        
-        .editor-table tr.completed-row .task-name-text {
-            text-decoration: line-through;
-            color: #1abc9c;
-        }
-        
-        .editor-table tr.dragging {
-            opacity: 0.5;
-            background: #667eea;
-        }
-        
-        .editor-table tr.drag-over {
-            border-top: 3px solid #667eea;
-        }
-        
-        .drag-handle {
-            cursor: grab;
-            font-size: 18px;
-            user-select: none;
-            padding: 5px 10px;
-        }
-        
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-        
-        .editor-table tr.section-row {
-            background: #1a1a2e;
-        }
-        
+        .editor-table tr.section-row { background: #1a1a2e; }
         .editor-table tr.section-row td {
-            padding: 10px;
-            font-weight: 600;
-            color: #667eea;
-            border-bottom: 2px solid #667eea;
+            padding: 10px; font-weight: 600; color: #667eea; border-bottom: 2px solid #667eea;
         }
         
         .editor-table input[type="text"],
         .editor-table input[type="number"],
         .editor-table input[type="date"] {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background: #1a1a2e;
-            color: #fff;
-            font-size: 13px;
+            width: 100%; padding: 6px 8px; border: 1px solid #444;
+            border-radius: 4px; background: #1a1a2e; color: #fff; font-size: 13px;
         }
-        
-        .editor-table input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
+        .editor-table input:focus { outline: none; border-color: #667eea; }
         .editor-table select {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background: #1a1a2e;
-            color: #fff;
-            font-size: 13px;
+            width: 100%; padding: 6px 8px; border: 1px solid #444;
+            border-radius: 4px; background: #1a1a2e; color: #fff; font-size: 13px;
         }
+        .editor-table .narrow { width: 80px; }
+        .row-actions { display: flex; gap: 5px; flex-wrap: wrap; }
         
-        .editor-table .narrow {
-            width: 80px;
+        /* Stages */
+        .stages-container { margin-top: 6px; }
+        .stage-row {
+            display: flex; align-items: center; gap: 6px; padding: 3px 0;
+            font-size: 12px; color: #bbb;
         }
+        .stage-row input[type="checkbox"] { accent-color: #1abc9c; width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+        .stage-row .stage-name { flex: 1; }
+        .stage-row .stage-name-input {
+            background: transparent; border: 1px solid transparent; color: #bbb;
+            padding: 2px 4px; border-radius: 3px; font-size: 12px; width: 100%;
+        }
+        .stage-row .stage-name-input:focus { border-color: #667eea; background: #1a1a2e; color: #fff; }
+        .stage-row.stage-completed .stage-name-input { text-decoration: line-through; color: #1abc9c; }
+        .stage-row .stage-delete { color: #e74c3c; cursor: pointer; font-size: 14px; padding: 0 4px; opacity: 0.5; flex-shrink: 0; }
+        .stage-row .stage-delete:hover { opacity: 1; }
+        .add-stage-btn {
+            display: inline-block; margin-top: 4px; font-size: 11px; color: #667eea;
+            cursor: pointer; padding: 2px 6px; border-radius: 3px; border: 1px dashed #667eea40;
+        }
+        .add-stage-btn:hover { background: #667eea20; border-color: #667eea; }
         
-        .editor-table .medium {
-            width: 120px;
+        .stage-progress {
+            display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 10px; color: #888;
         }
+        .stage-progress-bar { width: 50px; height: 4px; background: #1a1a2e; border-radius: 2px; overflow: hidden; }
+        .stage-progress-fill { height: 100%; background: #1abc9c; border-radius: 2px; transition: width 0.3s; }
         
-        .row-actions {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .btn-small {
-            padding: 4px 8px;
-            font-size: 11px;
-        }
-        
-        /* Checkbox styling */
-        .done-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #1abc9c;
-        }
-        
-        .done-cell {
-            text-align: center;
-        }
-        
-        /* Progress bar */
-        .progress-bar-container {
-            background: #1a1a2e;
-            border-radius: 10px;
-            height: 10px;
-            overflow: hidden;
-            flex: 1;
-        }
-        
-        .progress-bar-fill {
-            height: 100%;
-            border-radius: 10px;
-            background: linear-gradient(90deg, #1abc9c, #27ae60);
-            transition: width 0.5s ease;
-        }
+        .done-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: #1abc9c; }
+        .done-cell { text-align: center; }
         
         .progress-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: #252545;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            background: #252545; border-radius: 8px; margin-bottom: 15px;
         }
+        .progress-bar-container { background: #1a1a2e; border-radius: 10px; height: 10px; overflow: hidden; flex: 1; }
+        .progress-bar-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #1abc9c, #27ae60); transition: width 0.5s ease; }
+        .progress-text { font-size: 13px; color: #aaa; white-space: nowrap; }
+        .progress-pct { font-size: 16px; font-weight: 700; color: #1abc9c; white-space: nowrap; }
         
-        .progress-text {
-            font-size: 13px;
-            color: #aaa;
-            white-space: nowrap;
-        }
+        /* Gantt */
+        .gantt-container { max-width: 1600px; margin: 0 auto; }
+        .legend { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 3px; }
         
-        .progress-pct {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1abc9c;
-            white-space: nowrap;
-        }
-        
-        /* Gantt styles */
-        .gantt-container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-        
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-        
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 3px;
-        }
-        
-        .gantt-wrapper {
-            background: #252545;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .gantt-scroll {
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-        
+        .gantt-wrapper { background: #252545; border-radius: 8px; overflow: hidden; }
+        .gantt-scroll { overflow-x: auto; padding-bottom: 10px; }
         .gantt {
-            display: grid;
-            min-width: 2800px;
-            gap: 1px;
-            background: #1a1a2e;
+            display: grid; min-width: 2800px; gap: 1px; background: #1a1a2e;
             grid-template-columns: 280px repeat(140, 18px);
         }
-        
-        .month-row, .day-row, .task-row {
-            display: contents;
-        }
-        
-        .month-cell {
-            background: #3a3a5a;
-            padding: 5px 4px;
-            font-size: 10px;
-            font-weight: 600;
-            text-align: center;
-            color: #fff;
-        }
-        
-        .month-cell.task-col {
-            text-align: left;
-            padding-left: 12px;
-        }
-        
-        .day-cell {
-            background: #2a2a4a;
-            padding: 3px 2px;
-            font-size: 8px;
-            text-align: center;
-            color: #888;
-        }
-        
-        .day-cell.task-col {
-            background: #3a3a5a;
-            font-size: 10px;
-            font-weight: 600;
-            color: #fff;
-            text-align: left;
-            padding-left: 12px;
-        }
-        
-        .day-cell.weekend {
-            background: #222240;
-            color: #555;
-        }
-        
-        .day-cell.today {
-            background: #667eea;
-            color: #fff;
-            font-weight: bold;
-        }
+        .month-row, .day-row, .task-row { display: contents; }
+        .month-cell { background: #3a3a5a; padding: 5px 4px; font-size: 10px; font-weight: 600; text-align: center; color: #fff; }
+        .month-cell.task-col { text-align: left; padding-left: 12px; }
+        .day-cell { background: #2a2a4a; padding: 3px 2px; font-size: 8px; text-align: center; color: #888; }
+        .day-cell.task-col { background: #3a3a5a; font-size: 10px; font-weight: 600; color: #fff; text-align: left; padding-left: 12px; }
+        .day-cell.weekend { background: #222240; color: #555; }
+        .day-cell.today { background: #667eea; color: #fff; font-weight: bold; }
         
         .section-header {
-            grid-column: 1 / -1;
-            background: #1a1a2e;
-            padding: 8px 12px;
-            font-weight: 600;
-            font-size: 12px;
-            color: #667eea;
-            border-left: 3px solid #667eea;
+            grid-column: 1 / -1; background: #1a1a2e; padding: 8px 12px;
+            font-weight: 600; font-size: 12px; color: #667eea; border-left: 3px solid #667eea;
         }
-        
-        .section-header.critical {
-            color: #ff6b6b;
-            border-left-color: #ff6b6b;
-        }
+        .section-header.critical { color: #ff6b6b; border-left-color: #ff6b6b; }
         
         .task-name {
-            background: #252545;
-            padding: 8px 12px;
-            font-size: 11px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-left: 3px solid #667eea;
+            background: #252545; padding: 8px 12px; font-size: 11px;
+            display: flex; flex-direction: column; justify-content: center; border-left: 3px solid #667eea;
         }
-        
         .task-name.delivery { border-left-color: #27ae60; }
         .task-name.decision { border-left-color: #3498db; }
         .task-name.work { border-left-color: #9b59b6; }
         .task-name.critical { border-left-color: #e74c3c; background: #2d2040; }
         .task-name.warning { border-left-color: #f39c12; }
         .task-name.done { border-left-color: #1abc9c; }
-        .task-name.completed-task {
-            border-left-color: #1abc9c !important;
-            opacity: 0.55;
-        }
-        .task-name.completed-task .task-title {
-            text-decoration: line-through;
-            color: #1abc9c;
-        }
+        .task-name.completed-task { border-left-color: #1abc9c !important; opacity: 0.55; }
+        .task-name.completed-task .task-title { text-decoration: line-through; color: #1abc9c; }
+        .task-name.is-stage { padding-left: 28px; background: #222240; border-left-style: dashed; font-size: 10px; }
+        .task-name.is-stage .task-title { font-weight: 400; color: #bbb; }
+        .task-name.is-stage.completed-task .task-title { color: #1abc9c; }
         
         .task-title { font-weight: 500; }
         .task-dates { font-size: 9px; color: #888; margin-top: 2px; }
         .task-note { font-size: 9px; color: #ff6b6b; margin-top: 1px; }
-        .task-done-badge {
-            font-size: 9px;
-            color: #1abc9c;
-            margin-top: 1px;
-        }
+        .task-done-badge { font-size: 9px; color: #1abc9c; margin-top: 1px; }
+        .task-stage-info { font-size: 9px; color: #667eea; margin-top: 1px; }
         
-        .day-slot {
-            background: #252545;
-            position: relative;
-            min-height: 36px;
-        }
-        
+        .day-slot { background: #252545; position: relative; min-height: 36px; }
         .day-slot.weekend { background: #222240; }
+        .day-slot.is-stage { min-height: 28px; background: #222240; }
+        .day-slot.is-stage.weekend { background: #1e1e38; }
         
         .bar {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 20px;
-            border-radius: 2px;
-            left: 0;
-            right: 0;
+            position: absolute; top: 50%; transform: translateY(-50%);
+            height: 20px; border-radius: 2px; left: 0; right: 0;
         }
-        
         .bar.delivery { background: linear-gradient(135deg, #27ae60, #2ecc71); }
         .bar.decision { background: linear-gradient(135deg, #3498db, #5dade2); }
         .bar.work { background: linear-gradient(135deg, #9b59b6, #a569bd); }
@@ -471,124 +186,34 @@
         .bar.warning { background: linear-gradient(135deg, #f39c12, #f7b731); }
         .bar.done { background: linear-gradient(135deg, #1abc9c, #48c9b0); }
         .bar.completed-bar { background: linear-gradient(135deg, #1abc9c, #48c9b0) !important; opacity: 0.5; }
+        .bar.stage-bar { height: 14px; opacity: 0.7; }
         
         .bar.start { border-radius: 2px 0 0 2px; }
         .bar.end { border-radius: 0 2px 2px 0; }
         .bar.single { border-radius: 2px; }
         .bar.middle { border-radius: 0; }
         
-        /* Summary cards */
-        .summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .summary-card {
-            background: #252545;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-        
-        .summary-card .number {
-            font-size: 20px;
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        .summary-card .label {
-            font-size: 10px;
-            color: #888;
-            margin-top: 4px;
-        }
-        
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .summary-card { background: #252545; border-radius: 8px; padding: 12px; text-align: center; }
+        .summary-card .number { font-size: 20px; font-weight: 700; color: #667eea; }
+        .summary-card .label { font-size: 10px; color: #888; margin-top: 4px; }
         .summary-card.warning .number { color: #f39c12; }
         .summary-card.critical .number { color: #e74c3c; }
         .summary-card.success .number { color: #27ae60; }
         
-        /* Notes */
-        .notes {
-            margin-top: 25px;
-            background: #252545;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        
-        .notes h2 {
-            color: #ff6b6b;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-        
-        .notes-grid {
-            display: grid;
-            gap: 8px;
-        }
-        
-        .note-item {
-            padding: 10px 12px;
-            background: #2d2545;
-            border-radius: 5px;
-            border-left: 3px solid #ff6b6b;
-            font-size: 12px;
-        }
-        
+        .notes { margin-top: 25px; background: #252545; border-radius: 8px; padding: 15px; }
+        .notes h2 { color: #ff6b6b; margin-bottom: 12px; font-size: 14px; }
+        .notes-grid { display: grid; gap: 8px; }
+        .note-item { padding: 10px 12px; background: #2d2545; border-radius: 5px; border-left: 3px solid #ff6b6b; font-size: 12px; }
         .note-item strong { color: #fff; }
         .note-item.info { border-left-color: #667eea; background: #252560; }
-        .note-item.success { border-left-color: #27ae60; background: #253545; }
         
-        /* Export modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: #252545;
-            padding: 25px;
-            border-radius: 10px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .modal-content h3 {
-            margin-bottom: 15px;
-        }
-        
-        .modal-content textarea {
-            width: 100%;
-            height: 300px;
-            background: #1a1a2e;
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: #fff;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: flex-end;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #252545; padding: 25px; border-radius: 10px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 15px; }
+        .modal-content textarea { width: 100%; height: 300px; background: #1a1a2e; border: 1px solid #444; border-radius: 6px; color: #fff; padding: 10px; font-family: monospace; font-size: 12px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end; }
     </style>
 </head>
 <body>
@@ -600,27 +225,21 @@
         <button class="tab" onclick="switchTab('editor')">✏️ Redaguoti</button>
     </div>
     
-    <!-- GANTT VIEW -->
     <div id="gantt-view" class="view active">
         <div class="gantt-container">
             <div class="summary" id="summary"></div>
-            
             <div class="progress-info" id="gantt-progress"></div>
             
             <div class="legend">
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #27ae60, #2ecc71);"></div><span>Pristatymai</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3498db, #5dade2);"></div><span>Sprendimai</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #9b59b6, #a569bd);"></div><span>Darbai</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #e74c3c, #ec7063);"></div><span>Kritinis</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f39c12, #f7b731);"></div><span>Dėmesio</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #1abc9c, #48c9b0);"></div><span>Atlikta ✓</span></div>
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(135deg,#27ae60,#2ecc71)"></div><span>Pristatymai</span></div>
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(135deg,#3498db,#5dade2)"></div><span>Sprendimai</span></div>
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(135deg,#9b59b6,#a569bd)"></div><span>Darbai</span></div>
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(135deg,#e74c3c,#ec7063)"></div><span>Kritinis</span></div>
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(135deg,#f39c12,#f7b731)"></div><span>Dėmesio</span></div>
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(135deg,#1abc9c,#48c9b0)"></div><span>Atlikta ✓</span></div>
             </div>
             
-            <div class="gantt-wrapper">
-                <div class="gantt-scroll">
-                    <div class="gantt" id="gantt"></div>
-                </div>
-            </div>
+            <div class="gantt-wrapper"><div class="gantt-scroll"><div class="gantt" id="gantt"></div></div></div>
             
             <div class="notes">
                 <h2>⚠️ Klausimai Balstetai</h2>
@@ -630,9 +249,8 @@
                     <div class="note-item"><strong>3. Parketas:</strong> Kada klojėjai? Koordinuoti aukščius!</div>
                 </div>
             </div>
-            
-            <div class="notes" style="margin-top: 15px;">
-                <h2 style="color: #667eea;">📋 Priklausomybės</h2>
+            <div class="notes" style="margin-top:15px">
+                <h2 style="color:#667eea">📋 Priklausomybės</h2>
                 <div class="notes-grid">
                     <div class="note-item info"><strong>Sienos:</strong> Gipskartonis → Glaistymas → Durys → Mikrocementas → Dažymas</div>
                     <div class="note-item info"><strong>Grindys:</strong> Aukščiai žinoti iki 02-09</div>
@@ -641,33 +259,31 @@
         </div>
     </div>
     
-    <!-- EDITOR VIEW -->
     <div id="editor-view" class="view">
         <div class="editor-container">
             <div class="toolbar">
                 <label>Projekto pradžia: </label>
                 <input type="date" id="startDate" class="start-date-input" value="2025-01-26" onchange="updateAll()">
-                <button class="btn btn-success" onclick="addTask()">➕ Pridėti užduotį</button>
-                <button class="btn btn-primary" onclick="addSection()">📁 Pridėti sekciją</button>
+                <button class="btn btn-success" onclick="addTask()">➕ Užduotis</button>
+                <button class="btn btn-primary" onclick="addSection()">📁 Sekcija</button>
                 <button class="btn btn-secondary" onclick="exportData()">💾 Eksportuoti</button>
                 <button class="btn btn-secondary" onclick="importData()">📂 Importuoti</button>
             </div>
-            
             <div class="progress-info" id="editor-progress"></div>
             
             <div class="editor-table-wrapper">
                 <table class="editor-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px;"></th>
-                            <th style="width: 35px;">✓</th>
-                            <th style="width: 230px;">Užduotis</th>
-                            <th style="width: 100px;">Tipas</th>
-                            <th style="width: 110px;">Pradžia</th>
-                            <th style="width: 70px;">Trukmė (d)</th>
-                            <th style="width: 110px;">Pabaiga</th>
+                            <th style="width:40px"></th>
+                            <th style="width:35px">✓</th>
+                            <th style="width:250px">Užduotis / Etapai</th>
+                            <th style="width:95px">Tipas</th>
+                            <th style="width:110px">Pradžia</th>
+                            <th style="width:55px">Dienų</th>
+                            <th style="width:110px">Pabaiga</th>
                             <th>Pastaba</th>
-                            <th style="width: 80px;">Veiksmai</th>
+                            <th style="width:75px"></th>
                         </tr>
                     </thead>
                     <tbody id="taskTable"></tbody>
@@ -676,10 +292,9 @@
         </div>
     </div>
     
-    <!-- EXPORT/IMPORT MODAL -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h3 id="modalTitle">Eksportuoti duomenis</h3>
+            <h3 id="modalTitle">Eksportuoti</h3>
             <textarea id="modalData"></textarea>
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="closeModal()">Uždaryti</button>
@@ -688,506 +303,346 @@
         </div>
     </div>
 
-    <script>
-        // ======= TIMEZONE-SAFE DATE HELPERS =======
-        // Always work with YYYY-MM-DD strings and parse without timezone shift
+<script>
+// ===== DATE HELPERS =====
+function parseLocalDate(s){const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+function formatDate(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r}
+function daysBetween(a,b){return Math.round((new Date(b.getFullYear(),b.getMonth(),b.getDate())-new Date(a.getFullYear(),a.getMonth(),a.getDate()))/864e5)}
+function isWeekend(d){const w=d.getDay();return w===0||w===6}
+function getMonthName(d){return d.toLocaleDateString('lt-LT',{month:'short',year:'numeric'})}
+function todayLocal(){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// ===== DATA =====
+let projectStart = parseLocalDate('2025-01-26');
+
+let tasks = [
+    { type:'section', name:'📦 PRISTATYMAI IR SPRENDIMAI' },
+    { name:'Potinkinė santechnika, WC rėmas, trapas', category:'delivery', startDay:0, duration:7, note:'', completed:false, stages:[] },
+    { name:'Parketo/plytelių aukščiai - žinoti', category:'decision', startDay:7, duration:7, note:'Kritinis terminas!', completed:false, stages:[] },
+    { name:'Šviestuvų laidų išsikišimas', category:'decision', startDay:7, duration:7, note:'', completed:false, stages:[] },
+    { name:'Signalizacija', category:'delivery', startDay:7, duration:14, note:'', completed:false,
+      stages:[{name:'1. Kabelių instaliacija',completed:false},{name:'2. Daviklių/centralės montavimas',completed:false}] },
+    { name:'Plytelių pristatymas', category:'delivery', startDay:14, duration:14, note:'3-4 sav', completed:false, stages:[] },
+    { name:'Spalvų pasirinkimas (dažai)', category:'decision', startDay:42, duration:7, note:'7 sav', completed:false, stages:[] },
+    { name:'Rozetės, jungikliai, šviestuvai, santechnika', category:'delivery', startDay:56, duration:7, note:'9 sav', completed:false, stages:[] },
+    { name:'Difuzoriai (Ventman) - pristatyti', category:'delivery', startDay:14, duration:7, note:'Prieš gipskartonį', completed:false, stages:[] },
+    
+    { type:'section', name:'⚠️ KRITINIAI - IŠSIAIŠKINTI SU BALSTETA', critical:true },
+    { name:'Nematomos durys (1vnt vonia↔pagalbinė)', category:'critical', startDay:28, duration:14, note:'❓ PRIEŠ mikrocementą!', completed:false, stages:[] },
+    { name:'Mikrocementas (sienos + stakta)', category:'critical', startDay:42, duration:10, note:'❓ PO durų montavimo!', completed:false, stages:[] },
+    { name:'Parketo klojimas', category:'warning', startDay:56, duration:10, note:'❓ Klausti Balstetos kada', completed:false, stages:[] },
+    
+    { type:'section', name:'⏰ UŽSAKYTI LAIKU (nepamesti!)' },
+    { name:'Spintos - susirasti gamintoją', category:'warning', startDay:14, duration:14, note:'Ieškoti DABAR', completed:false, stages:[] },
+    { name:'Spintos - galutinis matavimas', category:'decision', startDay:42, duration:3, note:'Kai sienos baigtos', completed:false, stages:[] },
+    { name:'Vonios baldas - išsirinkti ir užsakyti', category:'warning', startDay:21, duration:21, note:'Reikia prieš kriauklę!', completed:false, stages:[] },
+    { name:'Veidrodžiai - išsirinkti', category:'decision', startDay:49, duration:14, note:'Laidas jau išvestas', completed:false, stages:[] },
+    
+    { type:'section', name:'🔨 DARBAI - PARUOŠIMAS' },
+    { name:'Griovimo darbai', category:'work', startDay:0, duration:7, note:'', completed:false, stages:[] },
+    { name:'Elektros instaliacija', category:'work', startDay:7, duration:14, note:'', completed:false,
+      stages:[{name:'1. Potinkinė (kabeliai, dėžutės)',completed:false},{name:'2. Apdaila (rozetės, jungikliai, šviestuvai)',completed:false}] },
+    { name:'Santechnikos instaliacija', category:'work', startDay:7, duration:14, note:'', completed:false,
+      stages:[{name:'1. Potinkinė (vamzdžiai, trapas, WC rėmas)',completed:false},{name:'2. Apdaila (kriauklė, WC, dušas, maišytuvai)',completed:false}] },
+    { name:'Ventiliacijos montavimas (Vallox 099 + difuzoriai)', category:'work', startDay:14, duration:10, note:'', completed:false, stages:[] },
+    { name:'Gipskartonio darbai', category:'work', startDay:21, duration:14, note:'', completed:false, stages:[] },
+    { name:'Grindų šildymo instaliacija', category:'work', startDay:28, duration:10, note:'', completed:false, stages:[] },
+    
+    { type:'section', name:'🔨 DARBAI - APDAILA' },
+    { name:'Glaistymas', category:'work', startDay:35, duration:10, note:'', completed:false, stages:[] },
+    { name:'Dažymas', category:'work', startDay:52, duration:10, note:'Po mikrocemento', completed:false, stages:[] },
+    { name:'Plytelės - vonia', category:'work', startDay:56, duration:7, note:'', completed:false, stages:[] },
+    { name:'Plytelės - pagalbinė patalpa', category:'work', startDay:63, duration:4, note:'', completed:false, stages:[] },
+    { name:'Plytelės - virtuvė/prieškambaris', category:'work', startDay:67, duration:5, note:'', completed:false, stages:[] },
+    
+    { type:'section', name:'🔨 DARBAI - MONTAVIMAS' },
+    { name:'Paprastos durys - montavimas', category:'work', startDay:70, duration:3, note:'Po dažymo, prieš grindjuostes', completed:false, stages:[] },
+    { name:'Vonios baldas - montavimas', category:'work', startDay:70, duration:2, note:'', completed:false, stages:[] },
+    { name:'Spintos - montavimas', category:'work', startDay:77, duration:5, note:'~4-6 sav po matavimo', completed:false, stages:[] },
+    { name:'Veidrodžiai - montavimas', category:'work', startDay:77, duration:2, note:'', completed:false, stages:[] },
+    { name:'Grindjuostės', category:'work', startDay:82, duration:3, note:'Po spintų!', completed:false, stages:[] },
+    { name:'Skalbimo mašinos prijungimas', category:'work', startDay:77, duration:1, note:'Pagalbinė patalpa', completed:false, stages:[] },
+    { name:'Baigiamieji darbai, valymas', category:'work', startDay:85, duration:7, note:'', completed:false, stages:[] },
+    
+    { type:'section', name:'✅ JAU UŽSAKYTA / NUPIRKTA' },
+    { name:'Vallox 099 entalpinis rekuperatorius', category:'done', startDay:0, duration:1, note:'', completed:true, stages:[] },
+    { name:'Difuzoriai (Ventman)', category:'done', startDay:0, duration:1, note:'', completed:true, stages:[] },
+    { name:'Alice Ceramica vonios keramika', category:'done', startDay:0, duration:1, note:'', completed:true, stages:[] },
+    { name:'Hansgrohe maišytuvai', category:'done', startDay:0, duration:1, note:'', completed:true, stages:[] },
+    
+    { type:'section', name:'⏸️ 2 ETAPAS (vėliau)' },
+    { name:'Virtuvės baldai - matavimas', category:'decision', startDay:92, duration:1, note:'Kai bus pinigų', completed:false, stages:[] },
+    { name:'Virtuvės baldai - gamyba', category:'delivery', startDay:93, duration:30, note:'~4-6 sav', completed:false, stages:[] },
+    { name:'Virtuvės baldai - montavimas', category:'work', startDay:123, duration:3, note:'', completed:false, stages:[] },
+    { name:'Buitinė technika', category:'delivery', startDay:123, duration:3, note:'Orkaitė, kaitlentė, indaplovė', completed:false, stages:[] },
+];
+
+const categories = {
+    delivery:{name:'Pristatymas',color:'#27ae60'}, decision:{name:'Sprendimas',color:'#3498db'},
+    work:{name:'Darbai',color:'#9b59b6'}, critical:{name:'Kritinis',color:'#e74c3c'},
+    warning:{name:'Dėmesio',color:'#f39c12'}, done:{name:'Atlikta',color:'#1abc9c'}
+};
+
+// ===== HELPERS =====
+function isTaskCompleted(t){if(t.type)return false;if(t.stages&&t.stages.length>0)return t.stages.every(s=>s.completed);return t.completed}
+function getStageProgress(t){if(!t.stages||!t.stages.length)return null;const d=t.stages.filter(s=>s.completed).length;return{done:d,total:t.stages.length,pct:Math.round(d/t.stages.length*100)}}
+function syncTaskCompleted(t){if(t.stages&&t.stages.length>0)t.completed=t.stages.every(s=>s.completed)}
+
+function getProgress(){
+    const r=tasks.filter(t=>!t.type);const total=r.length;
+    const completed=r.filter(t=>isTaskCompleted(t)).length;
+    return{total,completed,pct:total?Math.round(completed/total*100):0}
+}
+function renderProgress(id){
+    const{total,completed,pct}=getProgress();
+    document.getElementById(id).innerHTML=`
+        <span class="progress-pct">${pct}%</span>
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        <span class="progress-text">${completed} iš ${total} užduočių atlikta</span>`;
+}
+
+// ===== TAB =====
+function switchTab(tab){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+    document.getElementById(`${tab}-view`).classList.add('active');
+    if(tab==='gantt')renderGantt();
+}
+
+// ===== EDITOR =====
+function renderEditor(){
+    const tbody=document.getElementById('taskTable');
+    tbody.innerHTML='';
+    
+    tasks.forEach((task,index)=>{
+        const tr=document.createElement('tr');
+        tr.draggable=true; tr.dataset.index=index;
         
-        function parseLocalDate(str) {
-            // Parse "YYYY-MM-DD" as local date (not UTC)
-            const parts = str.split('-');
-            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-        }
+        tr.addEventListener('dragstart',e=>{tr.classList.add('dragging');e.dataTransfer.setData('text/plain',index)});
+        tr.addEventListener('dragend',()=>{tr.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'))});
+        tr.addEventListener('dragover',e=>{e.preventDefault();tr.classList.add('drag-over')});
+        tr.addEventListener('dragleave',()=>tr.classList.remove('drag-over'));
+        tr.addEventListener('drop',e=>{
+            e.preventDefault();tr.classList.remove('drag-over');
+            const from=parseInt(e.dataTransfer.getData('text/plain'));
+            if(from!==index){const item=tasks.splice(from,1)[0];tasks.splice(index,0,item);saveToStorage();renderEditor()}
+        });
         
-        function formatDate(date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        }
-        
-        function addDays(date, days) {
-            const result = new Date(date);
-            result.setDate(result.getDate() + days);
-            return result;
-        }
-        
-        function daysBetween(date1, date2) {
-            // Normalize both to midnight local
-            const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
-            const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
-            return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
-        }
-        
-        function isWeekend(date) {
-            const day = date.getDay();
-            return day === 0 || day === 6;
-        }
-        
-        function getMonthName(date) {
-            return date.toLocaleDateString('lt-LT', { month: 'short', year: 'numeric' });
-        }
-        
-        function todayLocal() {
-            const now = new Date();
-            return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        }
-        
-        // ======= DATA =======
-        let projectStart = parseLocalDate('2025-01-26');
-        let tasks = [
-            { type: 'section', name: '📦 PRISTATYMAI IR SPRENDIMAI' },
-            { name: 'Potinkinė santechnika, WC rėmas, trapas', category: 'delivery', startDay: 0, duration: 7, note: '', completed: false },
-            { name: 'Parketo/plytelių aukščiai - žinoti', category: 'decision', startDay: 7, duration: 7, note: 'Kritinis terminas!', completed: false },
-            { name: 'Šviestuvų laidų išsikišimas', category: 'decision', startDay: 7, duration: 7, note: '', completed: false },
-            { name: 'Signalizacija', category: 'delivery', startDay: 7, duration: 7, note: '', completed: false },
-            { name: 'Plytelių pristatymas', category: 'delivery', startDay: 14, duration: 14, note: '3-4 sav', completed: false },
-            { name: 'Spalvų pasirinkimas (dažai)', category: 'decision', startDay: 42, duration: 7, note: '7 sav', completed: false },
-            { name: 'Rozetės, jungikliai, šviestuvai, santechnika', category: 'delivery', startDay: 56, duration: 7, note: '9 sav', completed: false },
-            { name: 'Difuzoriai (Ventman) - pristatyti', category: 'delivery', startDay: 14, duration: 7, note: 'Prieš gipskartonį', completed: false },
+        if(task.type==='section'){
+            tr.className='section-row';
+            tr.innerHTML=`<td class="drag-handle">☰</td><td></td>
+                <td colspan="5"><input type="text" value="${escapeHtml(task.name)}" onchange="updateTask(${index},'name',this.value)"></td>
+                <td></td><td><div class="row-actions"><button class="btn btn-danger btn-small" onclick="deleteTask(${index})">🗑️</button></div></td>`;
+        } else {
+            const sDate=addDays(projectStart,task.startDay);
+            const eDate=addDays(projectStart,task.startDay+task.duration);
+            const done=isTaskCompleted(task);
+            const hasStages=task.stages&&task.stages.length>0;
+            const sp=getStageProgress(task);
             
-            { type: 'section', name: '⚠️ KRITINIAI - IŠSIAIŠKINTI SU BALSTETA', critical: true },
-            { name: 'Nematomos durys (1vnt vonia↔pagalbinė)', category: 'critical', startDay: 28, duration: 14, note: '❓ PRIEŠ mikrocementą!', completed: false },
-            { name: 'Mikrocementas (sienos + stakta)', category: 'critical', startDay: 42, duration: 10, note: '❓ PO durų montavimo!', completed: false },
-            { name: 'Parketo klojimas', category: 'warning', startDay: 56, duration: 10, note: '❓ Klausti Balstetos kada', completed: false },
+            if(done)tr.classList.add('completed-row');
             
-            { type: 'section', name: '⏰ UŽSAKYTI LAIKU (nepamesti!)' },
-            { name: 'Spintos - susirasti gamintoją', category: 'warning', startDay: 14, duration: 14, note: 'Ieškoti DABAR', completed: false },
-            { name: 'Spintos - galutinis matavimas', category: 'decision', startDay: 42, duration: 3, note: 'Kai sienos baigtos', completed: false },
-            { name: 'Vonios baldas - išsirinkti ir užsakyti', category: 'warning', startDay: 21, duration: 21, note: 'Reikia prieš kriauklę!', completed: false },
-            { name: 'Veidrodžiai - išsirinkti', category: 'decision', startDay: 49, duration: 14, note: 'Laidas jau išvestas', completed: false },
+            let stagesHtml='<div class="stages-container">';
+            if(hasStages){
+                task.stages.forEach((stage,si)=>{
+                    const sc=stage.completed?' stage-completed':'';
+                    stagesHtml+=`<div class="stage-row${sc}">
+                        <input type="checkbox" ${stage.completed?'checked':''} onchange="toggleStage(${index},${si},this.checked)">
+                        <div class="stage-name"><input type="text" class="stage-name-input" value="${escapeHtml(stage.name)}" onchange="updateStageName(${index},${si},this.value)"></div>
+                        <span class="stage-delete" onclick="deleteStage(${index},${si})">✕</span>
+                    </div>`;
+                });
+                stagesHtml+=`<div class="stage-progress"><div class="stage-progress-bar"><div class="stage-progress-fill" style="width:${sp.pct}%"></div></div><span>${sp.done}/${sp.total}</span></div>`;
+            }
+            stagesHtml+=`<span class="add-stage-btn" onclick="addStage(${index})">+ etapas</span></div>`;
             
-            { type: 'section', name: '🔨 DARBAI - PARUOŠIMAS' },
-            { name: 'Griovimo darbai', category: 'work', startDay: 0, duration: 7, note: '', completed: false },
-            { name: 'Elektros instaliacija', category: 'work', startDay: 7, duration: 14, note: '', completed: false },
-            { name: 'Santechnikos instaliacija', category: 'work', startDay: 7, duration: 14, note: '', completed: false },
-            { name: 'Ventiliacijos montavimas (Vallox 099 + difuzoriai)', category: 'work', startDay: 14, duration: 10, note: '', completed: false },
-            { name: 'Gipskartonio darbai', category: 'work', startDay: 21, duration: 14, note: '', completed: false },
-            { name: 'Grindų šildymo instaliacija', category: 'work', startDay: 28, duration: 10, note: '', completed: false },
-            
-            { type: 'section', name: '🔨 DARBAI - APDAILA' },
-            { name: 'Glaistymas', category: 'work', startDay: 35, duration: 10, note: '', completed: false },
-            { name: 'Dažymas', category: 'work', startDay: 52, duration: 10, note: 'Po mikrocemento', completed: false },
-            { name: 'Plytelės - vonia', category: 'work', startDay: 56, duration: 7, note: '', completed: false },
-            { name: 'Plytelės - pagalbinė patalpa', category: 'work', startDay: 63, duration: 4, note: '', completed: false },
-            { name: 'Plytelės - virtuvė/prieškambaris', category: 'work', startDay: 67, duration: 5, note: '', completed: false },
-            
-            { type: 'section', name: '🔨 DARBAI - MONTAVIMAS' },
-            { name: 'Paprastos durys - montavimas', category: 'work', startDay: 70, duration: 3, note: 'Po dažymo, prieš grindjuostes', completed: false },
-            { name: 'Vonios baldas - montavimas', category: 'work', startDay: 70, duration: 2, note: '', completed: false },
-            { name: 'Santechnikos apdaila (kriauklė, WC, dušas)', category: 'work', startDay: 72, duration: 5, note: 'Hansgrohe', completed: false },
-            { name: 'Elektros apdaila (rozetės, jungikliai, šviestuvai)', category: 'work', startDay: 72, duration: 5, note: '', completed: false },
-            { name: 'Spintos - montavimas', category: 'work', startDay: 77, duration: 5, note: '~4-6 sav po matavimo', completed: false },
-            { name: 'Veidrodžiai - montavimas', category: 'work', startDay: 77, duration: 2, note: '', completed: false },
-            { name: 'Grindjuostės', category: 'work', startDay: 82, duration: 3, note: 'Po spintų!', completed: false },
-            { name: 'Skalbimo mašinos prijungimas', category: 'work', startDay: 77, duration: 1, note: 'Pagalbinė patalpa', completed: false },
-            { name: 'Baigiamieji darbai, valymas', category: 'work', startDay: 85, duration: 7, note: '', completed: false },
-            
-            { type: 'section', name: '✅ JAU UŽSAKYTA / NUPIRKTA' },
-            { name: 'Vallox 099 entalpinis rekuperatorius', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
-            { name: 'Difuzoriai (Ventman)', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
-            { name: 'Alice Ceramica vonios keramika', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
-            { name: 'Hansgrohe maišytuvai', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
-            
-            { type: 'section', name: '⏸️ 2 ETAPAS (vėliau)' },
-            { name: 'Virtuvės baldai - matavimas', category: 'decision', startDay: 92, duration: 1, note: 'Kai bus pinigų', completed: false },
-            { name: 'Virtuvės baldai - gamyba', category: 'delivery', startDay: 93, duration: 30, note: '~4-6 sav', completed: false },
-            { name: 'Virtuvės baldai - montavimas', category: 'work', startDay: 123, duration: 3, note: '', completed: false },
-            { name: 'Buitinė technika', category: 'delivery', startDay: 123, duration: 3, note: 'Orkaitė, kaitlentė, indaplovė', completed: false },
-        ];
-        
-        const categories = {
-            delivery: { name: 'Pristatymas', color: '#27ae60' },
-            decision: { name: 'Sprendimas', color: '#3498db' },
-            work: { name: 'Darbai', color: '#9b59b6' },
-            critical: { name: 'Kritinis', color: '#e74c3c' },
-            warning: { name: 'Dėmesio', color: '#f39c12' },
-            done: { name: 'Atlikta', color: '#1abc9c' }
-        };
-        
-        // ======= TAB SWITCHING =======
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            
-            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-            document.getElementById(`${tab}-view`).classList.add('active');
-            
-            if (tab === 'gantt') renderGantt();
+            tr.innerHTML=`<td class="drag-handle">☰</td>
+                <td class="done-cell">${hasStages
+                    ?`<span style="font-size:16px;color:${done?'#1abc9c':'#555'}">${done?'✅':'⏳'}</span>`
+                    :`<input type="checkbox" class="done-checkbox" ${done?'checked':''} onchange="toggleCompleted(${index},this.checked)" title="Pažymėti kaip atliktą">`}</td>
+                <td><input type="text" class="task-name-input" value="${escapeHtml(task.name)}" onchange="updateTask(${index},'name',this.value)">${stagesHtml}</td>
+                <td><select onchange="updateTask(${index},'category',this.value)">
+                    ${Object.entries(categories).map(([k,v])=>`<option value="${k}" ${task.category===k?'selected':''}>${v.name}</option>`).join('')}</select></td>
+                <td><input type="date" value="${formatDate(sDate)}" onchange="updateStartDate(${index},this.value)"></td>
+                <td><input type="number" value="${task.duration}" min="1" class="narrow" onchange="updateTask(${index},'duration',parseInt(this.value))"></td>
+                <td><input type="date" value="${formatDate(eDate)}" onchange="updateEndDate(${index},this.value)" style="color:#aaa"></td>
+                <td><input type="text" value="${escapeHtml(task.note||'')}" onchange="updateTask(${index},'note',this.value)" placeholder="Pastaba..."></td>
+                <td><div class="row-actions"><button class="btn btn-danger btn-small" onclick="deleteTask(${index})">🗑️</button></div></td>`;
         }
+        tbody.appendChild(tr);
+    });
+    renderProgress('editor-progress');
+}
+
+function updateTask(i,f,v){tasks[i][f]=v;saveToStorage();renderEditor()}
+
+// Changing START date: keep DURATION fixed → end date moves
+function updateStartDate(i,ds){
+    const newStart=parseLocalDate(ds);
+    tasks[i].startDay=daysBetween(projectStart,newStart);
+    // duration stays the same, end date auto-recalculates
+    saveToStorage();renderEditor();
+}
+
+// Changing END date: keep START fixed → recalculate duration
+function updateEndDate(i,ds){
+    const newEnd=parseLocalDate(ds);
+    const curStart=addDays(projectStart, tasks[i].startDay);
+    const newDur=daysBetween(curStart,newEnd);
+    tasks[i].duration=Math.max(1,newDur);
+    saveToStorage();renderEditor();
+}
+function toggleCompleted(i,c){tasks[i].completed=c;saveToStorage();renderEditor()}
+function deleteTask(i){if(confirm('Ištrinti?')){tasks.splice(i,1);saveToStorage();renderEditor()}}
+function addTask(){tasks.push({name:'Nauja užduotis',category:'work',startDay:0,duration:7,note:'',completed:false,stages:[]});saveToStorage();renderEditor()}
+function addSection(){tasks.push({type:'section',name:'📁 Nauja sekcija'});saveToStorage();renderEditor()}
+
+function addStage(ti){
+    if(!tasks[ti].stages)tasks[ti].stages=[];
+    tasks[ti].stages.push({name:`${tasks[ti].stages.length+1}. Naujas etapas`,completed:false});
+    syncTaskCompleted(tasks[ti]);saveToStorage();renderEditor();
+}
+function toggleStage(ti,si,c){tasks[ti].stages[si].completed=c;syncTaskCompleted(tasks[ti]);saveToStorage();renderEditor()}
+function updateStageName(ti,si,v){tasks[ti].stages[si].name=v;saveToStorage()}
+function deleteStage(ti,si){tasks[ti].stages.splice(si,1);syncTaskCompleted(tasks[ti]);saveToStorage();renderEditor()}
+
+// ===== GANTT =====
+function renderGantt(){
+    const gantt=document.getElementById('gantt');
+    const totalDays=140;const today=todayLocal();let html='';
+    
+    // Months
+    html+='<div class="month-row"><div class="month-cell task-col">Užduotis</div>';
+    let months=[],cm=null,cnt=0;
+    for(let i=0;i<totalDays;i++){const mn=getMonthName(addDays(projectStart,i));if(mn!==cm){if(cm)months.push({name:cm,span:cnt});cm=mn;cnt=1}else cnt++}
+    months.push({name:cm,span:cnt});
+    months.forEach(m=>html+=`<div class="month-cell" style="grid-column:span ${m.span}">${m.name}</div>`);
+    html+='</div>';
+    
+    // Days
+    html+='<div class="day-row"><div class="day-cell task-col">Pradžia → Pabaiga</div>';
+    for(let i=0;i<totalDays;i++){
+        const d=addDays(projectStart,i);const wk=isWeekend(d)?' weekend':'';const td=d.toDateString()===today.toDateString()?' today':'';
+        html+=`<div class="day-cell${wk}${td}">${d.getDate()}</div>`;
+    }
+    html+='</div>';
+    
+    // Tasks
+    for(const task of tasks){
+        if(task.type==='section'){html+=`<div class="section-header${task.critical?' critical':''}">${task.name}</div>`;continue}
         
-        // ======= PROGRESS =======
-        function getProgress() {
-            const realTasks = tasks.filter(t => !t.type);
-            const total = realTasks.length;
-            const completed = realTasks.filter(t => t.completed).length;
-            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-            return { total, completed, pct };
+        const sDate=addDays(projectStart,task.startDay);
+        const eDate=addDays(projectStart,task.startDay+task.duration);
+        const dateStr=`${formatDate(sDate)} → ${formatDate(eDate)}`;
+        const done=isTaskCompleted(task);
+        const hasStages=task.stages&&task.stages.length>0;
+        const sp=getStageProgress(task);
+        
+        // Main row
+        html+='<div class="task-row">';
+        html+=`<div class="task-name ${task.category}${done?' completed-task':''}">
+            <div class="task-title">${done?'✓ ':''}${task.name}</div>
+            <div class="task-dates">${dateStr}</div>
+            ${done?'<div class="task-done-badge">✅ Atlikta</div>':''}
+            ${hasStages&&!done?`<div class="task-stage-info">⏳ ${sp.done}/${sp.total} etapų</div>`:''}
+            ${!done&&!hasStages&&task.note?`<div class="task-note">${task.note}</div>`:''}
+        </div>`;
+        
+        for(let i=0;i<totalDays;i++){
+            const wk=isWeekend(addDays(projectStart,i))?' weekend':'';
+            const inR=i>=task.startDay&&i<task.startDay+task.duration;
+            if(inR){
+                let bc=done?'completed-bar':task.category;
+                if(task.duration===1)bc+=' single';else if(i===task.startDay)bc+=' start';else if(i===task.startDay+task.duration-1)bc+=' end';else bc+=' middle';
+                html+=`<div class="day-slot"><div class="bar ${bc}"></div></div>`;
+            }else html+=`<div class="day-slot${wk}"></div>`;
         }
+        html+='</div>';
         
-        function renderProgress(containerId) {
-            const { total, completed, pct } = getProgress();
-            const el = document.getElementById(containerId);
-            el.innerHTML = `
-                <span class="progress-pct">${pct}%</span>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" style="width: ${pct}%;"></div>
-                </div>
-                <span class="progress-text">${completed} iš ${total} užduočių atlikta</span>
-            `;
-        }
-        
-        // ======= EDITOR =======
-        function renderEditor() {
-            const tbody = document.getElementById('taskTable');
-            tbody.innerHTML = '';
-            
-            tasks.forEach((task, index) => {
-                const tr = document.createElement('tr');
-                tr.draggable = true;
-                tr.dataset.index = index;
+        // Stage sub-rows
+        if(hasStages){
+            const sDur=Math.max(1,Math.floor(task.duration/task.stages.length));
+            task.stages.forEach((stage,si)=>{
+                const ss=task.startDay+si*sDur;
+                const se=(si===task.stages.length-1)?task.startDay+task.duration:ss+sDur;
+                const sd=stage.completed;
                 
-                // Drag events
-                tr.addEventListener('dragstart', (e) => {
-                    tr.classList.add('dragging');
-                    e.dataTransfer.setData('text/plain', index);
-                    e.dataTransfer.effectAllowed = 'move';
-                });
-                tr.addEventListener('dragend', () => {
-                    tr.classList.remove('dragging');
-                    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                });
-                tr.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                    tr.classList.add('drag-over');
-                });
-                tr.addEventListener('dragleave', () => {
-                    tr.classList.remove('drag-over');
-                });
-                tr.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    tr.classList.remove('drag-over');
-                    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                    const toIndex = index;
-                    if (fromIndex !== toIndex) {
-                        const item = tasks.splice(fromIndex, 1)[0];
-                        tasks.splice(toIndex, 0, item);
-                        saveToStorage();
-                        renderEditor();
-                    }
-                });
+                html+='<div class="task-row">';
+                html+=`<div class="task-name is-stage ${task.category}${sd?' completed-task':''}">
+                    <div class="task-title">${sd?'✓ ':'○ '}${stage.name}</div></div>`;
                 
-                if (task.type === 'section') {
-                    tr.className = 'section-row';
-                    tr.innerHTML = `
-                        <td class="drag-handle">☰</td>
-                        <td></td>
-                        <td colspan="5">
-                            <input type="text" value="${escapeHtml(task.name)}" onchange="updateTask(${index}, 'name', this.value)">
-                        </td>
-                        <td></td>
-                        <td>
-                            <div class="row-actions">
-                                <button class="btn btn-danger btn-small" onclick="deleteTask(${index})">🗑️</button>
-                            </div>
-                        </td>
-                    `;
-                } else {
-                    const startDate = addDays(projectStart, task.startDay);
-                    const endDate = addDays(projectStart, task.startDay + task.duration);
-                    const isCompleted = task.completed;
-                    
-                    if (isCompleted) tr.classList.add('completed-row');
-                    
-                    tr.innerHTML = `
-                        <td class="drag-handle">☰</td>
-                        <td class="done-cell">
-                            <input type="checkbox" class="done-checkbox" 
-                                ${isCompleted ? 'checked' : ''} 
-                                onchange="toggleCompleted(${index}, this.checked)"
-                                title="Pažymėti kaip atliktą">
-                        </td>
-                        <td><input type="text" class="task-name-text" value="${escapeHtml(task.name)}" onchange="updateTask(${index}, 'name', this.value)"></td>
-                        <td>
-                            <select onchange="updateTask(${index}, 'category', this.value)">
-                                ${Object.entries(categories).map(([key, val]) => 
-                                    `<option value="${key}" ${task.category === key ? 'selected' : ''}>${val.name}</option>`
-                                ).join('')}
-                            </select>
-                        </td>
-                        <td><input type="date" value="${formatDate(startDate)}" onchange="updateTaskDate(${index}, this.value)"></td>
-                        <td><input type="number" value="${task.duration}" min="1" class="narrow" onchange="updateTask(${index}, 'duration', parseInt(this.value))"></td>
-                        <td style="color: #888;">${formatDate(endDate)}</td>
-                        <td><input type="text" value="${escapeHtml(task.note || '')}" onchange="updateTask(${index}, 'note', this.value)" placeholder="Pastaba..."></td>
-                        <td>
-                            <div class="row-actions">
-                                <button class="btn btn-danger btn-small" onclick="deleteTask(${index})">🗑️</button>
-                            </div>
-                        </td>
-                    `;
+                for(let i=0;i<totalDays;i++){
+                    const wk=isWeekend(addDays(projectStart,i))?' weekend':'';
+                    const inR=i>=ss&&i<se;
+                    if(inR){
+                        let bc=sd?'completed-bar stage-bar':task.category+' stage-bar';
+                        const len=se-ss;
+                        if(len===1)bc+=' single';else if(i===ss)bc+=' start';else if(i===se-1)bc+=' end';else bc+=' middle';
+                        html+=`<div class="day-slot is-stage"><div class="bar ${bc}"></div></div>`;
+                    }else html+=`<div class="day-slot is-stage${wk}"></div>`;
                 }
-                
-                tbody.appendChild(tr);
-            });
-            
-            renderProgress('editor-progress');
-        }
-        
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-        
-        function toggleCompleted(index, checked) {
-            tasks[index].completed = checked;
-            saveToStorage();
-            renderEditor();
-        }
-        
-        function updateTask(index, field, value) {
-            tasks[index][field] = value;
-            saveToStorage();
-            renderEditor();
-        }
-        
-        function updateTaskDate(index, dateStr) {
-            const newDate = parseLocalDate(dateStr);
-            tasks[index].startDay = daysBetween(projectStart, newDate);
-            saveToStorage();
-            renderEditor();
-        }
-        
-        function addTask() {
-            tasks.push({
-                name: 'Nauja užduotis',
-                category: 'work',
-                startDay: 0,
-                duration: 7,
-                note: '',
-                completed: false
-            });
-            saveToStorage();
-            renderEditor();
-        }
-        
-        function addSection() {
-            tasks.push({
-                type: 'section',
-                name: '📁 Nauja sekcija'
-            });
-            saveToStorage();
-            renderEditor();
-        }
-        
-        function deleteTask(index) {
-            if (confirm('Ištrinti šią eilutę?')) {
-                tasks.splice(index, 1);
-                saveToStorage();
-                renderEditor();
-            }
-        }
-        
-        // ======= GANTT =======
-        function renderGantt() {
-            const gantt = document.getElementById('gantt');
-            const totalDays = 140;
-            const today = todayLocal();
-            
-            let html = '';
-            
-            // Month row
-            html += '<div class="month-row"><div class="month-cell task-col">Užduotis</div>';
-            let months = [];
-            let currentMonth = null;
-            let count = 0;
-            
-            for (let i = 0; i < totalDays; i++) {
-                const date = addDays(projectStart, i);
-                const monthName = getMonthName(date);
-                if (monthName !== currentMonth) {
-                    if (currentMonth !== null) months.push({ name: currentMonth, span: count });
-                    currentMonth = monthName;
-                    count = 1;
-                } else {
-                    count++;
-                }
-            }
-            months.push({ name: currentMonth, span: count });
-            
-            for (const month of months) {
-                html += `<div class="month-cell" style="grid-column: span ${month.span}">${month.name}</div>`;
-            }
-            html += '</div>';
-            
-            // Day row
-            html += '<div class="day-row"><div class="day-cell task-col">Pradžia → Pabaiga</div>';
-            for (let i = 0; i < totalDays; i++) {
-                const date = addDays(projectStart, i);
-                const dayNum = date.getDate();
-                const weekend = isWeekend(date) ? ' weekend' : '';
-                const isToday = date.toDateString() === today.toDateString() ? ' today' : '';
-                html += `<div class="day-cell${weekend}${isToday}">${dayNum}</div>`;
-            }
-            html += '</div>';
-            
-            // Task rows
-            for (const task of tasks) {
-                if (task.type === 'section') {
-                    const critical = task.critical ? ' critical' : '';
-                    html += `<div class="section-header${critical}">${task.name}</div>`;
-                    continue;
-                }
-                
-                const startDate = addDays(projectStart, task.startDay);
-                const endDate = addDays(projectStart, task.startDay + task.duration);
-                const dateStr = `${formatDate(startDate)} → ${formatDate(endDate)}`;
-                const isCompleted = task.completed;
-                
-                html += '<div class="task-row">';
-                html += `<div class="task-name ${task.category}${isCompleted ? ' completed-task' : ''}">
-                    <div class="task-title">${isCompleted ? '✓ ' : ''}${task.name}</div>
-                    <div class="task-dates">${dateStr}</div>
-                    ${isCompleted ? '<div class="task-done-badge">✅ Atlikta</div>' : ''}
-                    ${!isCompleted && task.note ? `<div class="task-note">${task.note}</div>` : ''}
-                </div>`;
-                
-                for (let i = 0; i < totalDays; i++) {
-                    const date = addDays(projectStart, i);
-                    const weekend = isWeekend(date) ? ' weekend' : '';
-                    const inRange = i >= task.startDay && i < task.startDay + task.duration;
-                    
-                    if (inRange) {
-                        let barClass = isCompleted ? 'completed-bar' : task.category;
-                        if (task.duration === 1) barClass += ' single';
-                        else if (i === task.startDay) barClass += ' start';
-                        else if (i === task.startDay + task.duration - 1) barClass += ' end';
-                        else barClass += ' middle';
-                        html += `<div class="day-slot"><div class="bar ${barClass}"></div></div>`;
-                    } else {
-                        html += `<div class="day-slot${weekend}"></div>`;
-                    }
-                }
-                html += '</div>';
-            }
-            
-            gantt.innerHTML = html;
-            updateSummary();
-            renderProgress('gantt-progress');
-        }
-        
-        function updateSummary() {
-            const realTasks = tasks.filter(t => !t.type);
-            const maxEnd = Math.max(...realTasks.map(t => t.startDay + t.duration));
-            const endDate = addDays(projectStart, maxEnd);
-            const criticalCount = realTasks.filter(t => !t.completed && (t.category === 'critical' || t.category === 'warning')).length;
-            const { completed } = getProgress();
-            
-            document.getElementById('summary').innerHTML = `
-                <div class="summary-card">
-                    <div class="number">${formatDate(projectStart).slice(5)}</div>
-                    <div class="label">Pradžia</div>
-                </div>
-                <div class="summary-card">
-                    <div class="number">${maxEnd} d.</div>
-                    <div class="label">Trukmė</div>
-                </div>
-                <div class="summary-card">
-                    <div class="number">${formatDate(endDate).slice(5)}</div>
-                    <div class="label">Pabaiga</div>
-                </div>
-                <div class="summary-card critical">
-                    <div class="number">${criticalCount}</div>
-                    <div class="label">Kritiniai</div>
-                </div>
-                <div class="summary-card success">
-                    <div class="number">${completed}</div>
-                    <div class="label">Atlikta ✓</div>
-                </div>
-            `;
-        }
-        
-        function updateAll() {
-            const dateInput = document.getElementById('startDate');
-            projectStart = parseLocalDate(dateInput.value);
-            saveToStorage();
-            renderEditor();
-        }
-        
-        // ======= EXPORT / IMPORT =======
-        function exportData() {
-            const data = {
-                projectStart: formatDate(projectStart),
-                tasks: tasks
-            };
-            document.getElementById('modalTitle').textContent = 'Eksportuoti duomenis';
-            document.getElementById('modalData').value = JSON.stringify(data, null, 2);
-            document.getElementById('modalAction').textContent = 'Kopijuoti';
-            document.getElementById('modalAction').onclick = copyData;
-            document.getElementById('modal').classList.add('active');
-        }
-        
-        function importData() {
-            document.getElementById('modalTitle').textContent = 'Importuoti duomenis';
-            document.getElementById('modalData').value = '';
-            document.getElementById('modalAction').textContent = 'Importuoti';
-            document.getElementById('modalAction').onclick = doImport;
-            document.getElementById('modal').classList.add('active');
-        }
-        
-        function copyData() {
-            const textarea = document.getElementById('modalData');
-            textarea.select();
-            navigator.clipboard.writeText(textarea.value).then(() => {
-                alert('Nukopijuota!');
-            }).catch(() => {
-                document.execCommand('copy');
-                alert('Nukopijuota!');
+                html+='</div>';
             });
         }
-        
-        function doImport() {
-            try {
-                const data = JSON.parse(document.getElementById('modalData').value);
-                if (data.projectStart) {
-                    projectStart = parseLocalDate(data.projectStart);
-                    document.getElementById('startDate').value = data.projectStart;
-                }
-                if (data.tasks) {
-                    // Ensure completed field exists on imported tasks
-                    tasks = data.tasks.map(t => {
-                        if (!t.type && t.completed === undefined) {
-                            t.completed = false;
-                        }
-                        return t;
-                    });
-                }
-                saveToStorage();
-                renderEditor();
-                closeModal();
-                alert('Importuota sėkmingai!');
-            } catch (e) {
-                alert('Klaida: neteisingas formatas');
-            }
-        }
-        
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-        
-        // ======= STORAGE (in-memory, no localStorage) =======
-        function saveToStorage() {
-            // Data lives in memory; export to persist
-        }
-        
-        function loadFromStorage() {
-            // No localStorage; uses default data
-        }
-        
-        // ======= INIT =======
-        loadFromStorage();
-        renderEditor();
-        renderGantt();
-    </script>
+    }
+    
+    gantt.innerHTML=html;
+    updateSummary();renderProgress('gantt-progress');
+}
+
+function updateSummary(){
+    const real=tasks.filter(t=>!t.type);
+    const maxEnd=Math.max(...real.map(t=>t.startDay+t.duration));
+    const endDate=addDays(projectStart,maxEnd);
+    const crit=real.filter(t=>!isTaskCompleted(t)&&(t.category==='critical'||t.category==='warning')).length;
+    const{completed}=getProgress();
+    
+    document.getElementById('summary').innerHTML=`
+        <div class="summary-card"><div class="number">${formatDate(projectStart).slice(5)}</div><div class="label">Pradžia</div></div>
+        <div class="summary-card"><div class="number">${maxEnd} d.</div><div class="label">Trukmė</div></div>
+        <div class="summary-card"><div class="number">${formatDate(endDate).slice(5)}</div><div class="label">Pabaiga</div></div>
+        <div class="summary-card critical"><div class="number">${crit}</div><div class="label">Kritiniai</div></div>
+        <div class="summary-card success"><div class="number">${completed}</div><div class="label">Atlikta ✓</div></div>`;
+}
+
+function updateAll(){projectStart=parseLocalDate(document.getElementById('startDate').value);saveToStorage();renderEditor()}
+
+// ===== EXPORT/IMPORT =====
+function exportData(){
+    document.getElementById('modalTitle').textContent='Eksportuoti duomenis';
+    document.getElementById('modalData').value=JSON.stringify({projectStart:formatDate(projectStart),tasks},null,2);
+    document.getElementById('modalAction').textContent='Kopijuoti';
+    document.getElementById('modalAction').onclick=copyData;
+    document.getElementById('modal').classList.add('active');
+}
+function importData(){
+    document.getElementById('modalTitle').textContent='Importuoti duomenis';
+    document.getElementById('modalData').value='';
+    document.getElementById('modalAction').textContent='Importuoti';
+    document.getElementById('modalAction').onclick=doImport;
+    document.getElementById('modal').classList.add('active');
+}
+function copyData(){
+    const ta=document.getElementById('modalData');ta.select();
+    navigator.clipboard.writeText(ta.value).then(()=>alert('Nukopijuota!')).catch(()=>{document.execCommand('copy');alert('Nukopijuota!')});
+}
+function doImport(){
+    try{
+        const data=JSON.parse(document.getElementById('modalData').value);
+        if(data.projectStart){projectStart=parseLocalDate(data.projectStart);document.getElementById('startDate').value=data.projectStart}
+        if(data.tasks){tasks=data.tasks.map(t=>{if(!t.type){if(t.completed===undefined)t.completed=false;if(!t.stages)t.stages=[]}return t})}
+        saveToStorage();renderEditor();closeModal();alert('Importuota sėkmingai!');
+    }catch(e){alert('Klaida: neteisingas formatas')}
+}
+function closeModal(){document.getElementById('modal').classList.remove('active')}
+
+function saveToStorage(){}
+function loadFromStorage(){}
+
+loadFromStorage();renderEditor();renderGantt();
+</script>
 </body>
 </html>
