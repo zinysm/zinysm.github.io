@@ -145,7 +145,7 @@
         .editor-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 900px;
+            min-width: 1000px;
         }
         
         .editor-table th {
@@ -167,6 +167,15 @@
         
         .editor-table tr:hover {
             background: #2a2a4a;
+        }
+        
+        .editor-table tr.completed-row {
+            opacity: 0.55;
+        }
+        
+        .editor-table tr.completed-row .task-name-text {
+            text-decoration: line-through;
+            color: #1abc9c;
         }
         
         .editor-table tr.dragging {
@@ -235,15 +244,6 @@
             width: 120px;
         }
         
-        .color-preview {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-        
         .row-actions {
             display: flex;
             gap: 5px;
@@ -252,6 +252,57 @@
         .btn-small {
             padding: 4px 8px;
             font-size: 11px;
+        }
+        
+        /* Checkbox styling */
+        .done-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #1abc9c;
+        }
+        
+        .done-cell {
+            text-align: center;
+        }
+        
+        /* Progress bar */
+        .progress-bar-container {
+            background: #1a1a2e;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #1abc9c, #27ae60);
+            transition: width 0.5s ease;
+        }
+        
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #252545;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .progress-text {
+            font-size: 13px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+        
+        .progress-pct {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1abc9c;
+            white-space: nowrap;
         }
         
         /* Gantt styles */
@@ -377,10 +428,23 @@
         .task-name.critical { border-left-color: #e74c3c; background: #2d2040; }
         .task-name.warning { border-left-color: #f39c12; }
         .task-name.done { border-left-color: #1abc9c; }
+        .task-name.completed-task {
+            border-left-color: #1abc9c !important;
+            opacity: 0.55;
+        }
+        .task-name.completed-task .task-title {
+            text-decoration: line-through;
+            color: #1abc9c;
+        }
         
         .task-title { font-weight: 500; }
         .task-dates { font-size: 9px; color: #888; margin-top: 2px; }
         .task-note { font-size: 9px; color: #ff6b6b; margin-top: 1px; }
+        .task-done-badge {
+            font-size: 9px;
+            color: #1abc9c;
+            margin-top: 1px;
+        }
         
         .day-slot {
             background: #252545;
@@ -406,6 +470,7 @@
         .bar.critical { background: linear-gradient(135deg, #e74c3c, #ec7063); }
         .bar.warning { background: linear-gradient(135deg, #f39c12, #f7b731); }
         .bar.done { background: linear-gradient(135deg, #1abc9c, #48c9b0); }
+        .bar.completed-bar { background: linear-gradient(135deg, #1abc9c, #48c9b0) !important; opacity: 0.5; }
         
         .bar.start { border-radius: 2px 0 0 2px; }
         .bar.end { border-radius: 0 2px 2px 0; }
@@ -540,13 +605,15 @@
         <div class="gantt-container">
             <div class="summary" id="summary"></div>
             
+            <div class="progress-info" id="gantt-progress"></div>
+            
             <div class="legend">
                 <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #27ae60, #2ecc71);"></div><span>Pristatymai</span></div>
                 <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3498db, #5dade2);"></div><span>Sprendimai</span></div>
                 <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #9b59b6, #a569bd);"></div><span>Darbai</span></div>
                 <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #e74c3c, #ec7063);"></div><span>Kritinis</span></div>
                 <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f39c12, #f7b731);"></div><span>Dėmesio</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #1abc9c, #48c9b0);"></div><span>Atlikta</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #1abc9c, #48c9b0);"></div><span>Atlikta ✓</span></div>
             </div>
             
             <div class="gantt-wrapper">
@@ -586,12 +653,15 @@
                 <button class="btn btn-secondary" onclick="importData()">📂 Importuoti</button>
             </div>
             
+            <div class="progress-info" id="editor-progress"></div>
+            
             <div class="editor-table-wrapper">
                 <table class="editor-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;"></th>
-                            <th style="width: 250px;">Užduotis</th>
+                            <th style="width: 35px;">✓</th>
+                            <th style="width: 230px;">Užduotis</th>
                             <th style="width: 100px;">Tipas</th>
                             <th style="width: 110px;">Pradžia</th>
                             <th style="width: 70px;">Trukmė (d)</th>
@@ -619,91 +689,33 @@
     </div>
 
     <script>
-        // Data storage
-        let projectStart = new Date(2025, 0, 26);
-        let tasks = [
-            { type: 'section', name: '📦 PRISTATYMAI IR SPRENDIMAI' },
-            { name: 'Potinkinė santechnika, WC rėmas, trapas', category: 'delivery', startDay: 0, duration: 7, note: '' },
-            { name: 'Parketo/plytelių aukščiai - žinoti', category: 'decision', startDay: 7, duration: 7, note: 'Kritinis terminas!' },
-            { name: 'Šviestuvų laidų išsikišimas', category: 'decision', startDay: 7, duration: 7, note: '' },
-            { name: 'Signalizacija', category: 'delivery', startDay: 7, duration: 7, note: '' },
-            { name: 'Plytelių pristatymas', category: 'delivery', startDay: 14, duration: 14, note: '3-4 sav' },
-            { name: 'Spalvų pasirinkimas (dažai)', category: 'decision', startDay: 42, duration: 7, note: '7 sav' },
-            { name: 'Rozetės, jungikliai, šviestuvai, santechnika', category: 'delivery', startDay: 56, duration: 7, note: '9 sav' },
-            { name: 'Difuzoriai (Ventman) - pristatyti', category: 'delivery', startDay: 14, duration: 7, note: 'Prieš gipskartonį' },
-            
-            { type: 'section', name: '⚠️ KRITINIAI - IŠSIAIŠKINTI SU BALSTETA', critical: true },
-            { name: 'Nematomos durys (1vnt vonia↔pagalbinė)', category: 'critical', startDay: 28, duration: 14, note: '❓ PRIEŠ mikrocementą!' },
-            { name: 'Mikrocementas (sienos + stakta)', category: 'critical', startDay: 42, duration: 10, note: '❓ PO durų montavimo!' },
-            { name: 'Parketo klojimas', category: 'warning', startDay: 56, duration: 10, note: '❓ Klausti Balstetos kada' },
-            
-            { type: 'section', name: '⏰ UŽSAKYTI LAIKU (nepamesti!)' },
-            { name: 'Spintos - susirasti gamintoją', category: 'warning', startDay: 14, duration: 14, note: 'Ieškoti DABAR' },
-            { name: 'Spintos - galutinis matavimas', category: 'decision', startDay: 42, duration: 3, note: 'Kai sienos baigtos' },
-            { name: 'Vonios baldas - išsirinkti ir užsakyti', category: 'warning', startDay: 21, duration: 21, note: 'Reikia prieš kriauklę!' },
-            { name: 'Veidrodžiai - išsirinkti', category: 'decision', startDay: 49, duration: 14, note: 'Laidas jau išvestas' },
-            
-            { type: 'section', name: '🔨 DARBAI - PARUOŠIMAS' },
-            { name: 'Griovimo darbai', category: 'work', startDay: 0, duration: 7, note: '' },
-            { name: 'Elektros instaliacija', category: 'work', startDay: 7, duration: 14, note: '' },
-            { name: 'Santechnikos instaliacija', category: 'work', startDay: 7, duration: 14, note: '' },
-            { name: 'Ventiliacijos montavimas (Vallox 099 + difuzoriai)', category: 'work', startDay: 14, duration: 10, note: '' },
-            { name: 'Gipskartonio darbai', category: 'work', startDay: 21, duration: 14, note: '' },
-            { name: 'Grindų šildymo instaliacija', category: 'work', startDay: 28, duration: 10, note: '' },
-            
-            { type: 'section', name: '🔨 DARBAI - APDAILA' },
-            { name: 'Glaistymas', category: 'work', startDay: 35, duration: 10, note: '' },
-            { name: 'Dažymas', category: 'work', startDay: 52, duration: 10, note: 'Po mikrocemento' },
-            { name: 'Plytelės - vonia', category: 'work', startDay: 56, duration: 7, note: '' },
-            { name: 'Plytelės - pagalbinė patalpa', category: 'work', startDay: 63, duration: 4, note: '' },
-            { name: 'Plytelės - virtuvė/prieškambaris', category: 'work', startDay: 67, duration: 5, note: '' },
-            
-            { type: 'section', name: '🔨 DARBAI - MONTAVIMAS' },
-            { name: 'Paprastos durys - montavimas', category: 'work', startDay: 70, duration: 3, note: 'Po dažymo, prieš grindjuostes' },
-            { name: 'Vonios baldas - montavimas', category: 'work', startDay: 70, duration: 2, note: '' },
-            { name: 'Santechnikos apdaila (kriauklė, WC, dušas)', category: 'work', startDay: 72, duration: 5, note: 'Hansgrohe' },
-            { name: 'Elektros apdaila (rozetės, jungikliai, šviestuvai)', category: 'work', startDay: 72, duration: 5, note: '' },
-            { name: 'Spintos - montavimas', category: 'work', startDay: 77, duration: 5, note: '~4-6 sav po matavimo' },
-            { name: 'Veidrodžiai - montavimas', category: 'work', startDay: 77, duration: 2, note: '' },
-            { name: 'Grindjuostės', category: 'work', startDay: 82, duration: 3, note: 'Po spintų!' },
-            { name: 'Skalbimo mašinos prijungimas', category: 'work', startDay: 77, duration: 1, note: 'Pagalbinė patalpa' },
-            { name: 'Baigiamieji darbai, valymas', category: 'work', startDay: 85, duration: 7, note: '' },
-            
-            { type: 'section', name: '✅ JAU UŽSAKYTA / NUPIRKTA' },
-            { name: 'Vallox 099 entalpinis rekuperatorius', category: 'done', startDay: 0, duration: 1, note: '' },
-            { name: 'Difuzoriai (Ventman)', category: 'done', startDay: 0, duration: 1, note: '' },
-            { name: 'Alice Ceramica vonios keramika', category: 'done', startDay: 0, duration: 1, note: '' },
-            { name: 'Hansgrohe maišytuvai', category: 'done', startDay: 0, duration: 1, note: '' },
-            
-            { type: 'section', name: '⏸️ 2 ETAPAS (vėliau)' },
-            { name: 'Virtuvės baldai - matavimas', category: 'decision', startDay: 92, duration: 1, note: 'Kai bus pinigų' },
-            { name: 'Virtuvės baldai - gamyba', category: 'delivery', startDay: 93, duration: 30, note: '~4-6 sav' },
-            { name: 'Virtuvės baldai - montavimas', category: 'work', startDay: 123, duration: 3, note: '' },
-            { name: 'Buitinė technika', category: 'delivery', startDay: 123, duration: 3, note: 'Orkaitė, kaitlentė, indaplovė' },
-        ];
+        // ======= TIMEZONE-SAFE DATE HELPERS =======
+        // Always work with YYYY-MM-DD strings and parse without timezone shift
         
-        const categories = {
-            delivery: { name: 'Pristatymas', color: '#27ae60' },
-            decision: { name: 'Sprendimas', color: '#3498db' },
-            work: { name: 'Darbai', color: '#9b59b6' },
-            critical: { name: 'Kritinis', color: '#e74c3c' },
-            warning: { name: 'Dėmesio', color: '#f39c12' },
-            done: { name: 'Atlikta', color: '#1abc9c' }
-        };
+        function parseLocalDate(str) {
+            // Parse "YYYY-MM-DD" as local date (not UTC)
+            const parts = str.split('-');
+            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        }
         
-        // Utility functions
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
         function addDays(date, days) {
             const result = new Date(date);
             result.setDate(result.getDate() + days);
             return result;
         }
         
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-        
         function daysBetween(date1, date2) {
-            return Math.round((date2 - date1) / (1000 * 60 * 60 * 24));
+            // Normalize both to midnight local
+            const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+            const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+            return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
         }
         
         function isWeekend(date) {
@@ -715,7 +727,84 @@
             return date.toLocaleDateString('lt-LT', { month: 'short', year: 'numeric' });
         }
         
-        // Tab switching
+        function todayLocal() {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        }
+        
+        // ======= DATA =======
+        let projectStart = parseLocalDate('2025-01-26');
+        let tasks = [
+            { type: 'section', name: '📦 PRISTATYMAI IR SPRENDIMAI' },
+            { name: 'Potinkinė santechnika, WC rėmas, trapas', category: 'delivery', startDay: 0, duration: 7, note: '', completed: false },
+            { name: 'Parketo/plytelių aukščiai - žinoti', category: 'decision', startDay: 7, duration: 7, note: 'Kritinis terminas!', completed: false },
+            { name: 'Šviestuvų laidų išsikišimas', category: 'decision', startDay: 7, duration: 7, note: '', completed: false },
+            { name: 'Signalizacija', category: 'delivery', startDay: 7, duration: 7, note: '', completed: false },
+            { name: 'Plytelių pristatymas', category: 'delivery', startDay: 14, duration: 14, note: '3-4 sav', completed: false },
+            { name: 'Spalvų pasirinkimas (dažai)', category: 'decision', startDay: 42, duration: 7, note: '7 sav', completed: false },
+            { name: 'Rozetės, jungikliai, šviestuvai, santechnika', category: 'delivery', startDay: 56, duration: 7, note: '9 sav', completed: false },
+            { name: 'Difuzoriai (Ventman) - pristatyti', category: 'delivery', startDay: 14, duration: 7, note: 'Prieš gipskartonį', completed: false },
+            
+            { type: 'section', name: '⚠️ KRITINIAI - IŠSIAIŠKINTI SU BALSTETA', critical: true },
+            { name: 'Nematomos durys (1vnt vonia↔pagalbinė)', category: 'critical', startDay: 28, duration: 14, note: '❓ PRIEŠ mikrocementą!', completed: false },
+            { name: 'Mikrocementas (sienos + stakta)', category: 'critical', startDay: 42, duration: 10, note: '❓ PO durų montavimo!', completed: false },
+            { name: 'Parketo klojimas', category: 'warning', startDay: 56, duration: 10, note: '❓ Klausti Balstetos kada', completed: false },
+            
+            { type: 'section', name: '⏰ UŽSAKYTI LAIKU (nepamesti!)' },
+            { name: 'Spintos - susirasti gamintoją', category: 'warning', startDay: 14, duration: 14, note: 'Ieškoti DABAR', completed: false },
+            { name: 'Spintos - galutinis matavimas', category: 'decision', startDay: 42, duration: 3, note: 'Kai sienos baigtos', completed: false },
+            { name: 'Vonios baldas - išsirinkti ir užsakyti', category: 'warning', startDay: 21, duration: 21, note: 'Reikia prieš kriauklę!', completed: false },
+            { name: 'Veidrodžiai - išsirinkti', category: 'decision', startDay: 49, duration: 14, note: 'Laidas jau išvestas', completed: false },
+            
+            { type: 'section', name: '🔨 DARBAI - PARUOŠIMAS' },
+            { name: 'Griovimo darbai', category: 'work', startDay: 0, duration: 7, note: '', completed: false },
+            { name: 'Elektros instaliacija', category: 'work', startDay: 7, duration: 14, note: '', completed: false },
+            { name: 'Santechnikos instaliacija', category: 'work', startDay: 7, duration: 14, note: '', completed: false },
+            { name: 'Ventiliacijos montavimas (Vallox 099 + difuzoriai)', category: 'work', startDay: 14, duration: 10, note: '', completed: false },
+            { name: 'Gipskartonio darbai', category: 'work', startDay: 21, duration: 14, note: '', completed: false },
+            { name: 'Grindų šildymo instaliacija', category: 'work', startDay: 28, duration: 10, note: '', completed: false },
+            
+            { type: 'section', name: '🔨 DARBAI - APDAILA' },
+            { name: 'Glaistymas', category: 'work', startDay: 35, duration: 10, note: '', completed: false },
+            { name: 'Dažymas', category: 'work', startDay: 52, duration: 10, note: 'Po mikrocemento', completed: false },
+            { name: 'Plytelės - vonia', category: 'work', startDay: 56, duration: 7, note: '', completed: false },
+            { name: 'Plytelės - pagalbinė patalpa', category: 'work', startDay: 63, duration: 4, note: '', completed: false },
+            { name: 'Plytelės - virtuvė/prieškambaris', category: 'work', startDay: 67, duration: 5, note: '', completed: false },
+            
+            { type: 'section', name: '🔨 DARBAI - MONTAVIMAS' },
+            { name: 'Paprastos durys - montavimas', category: 'work', startDay: 70, duration: 3, note: 'Po dažymo, prieš grindjuostes', completed: false },
+            { name: 'Vonios baldas - montavimas', category: 'work', startDay: 70, duration: 2, note: '', completed: false },
+            { name: 'Santechnikos apdaila (kriauklė, WC, dušas)', category: 'work', startDay: 72, duration: 5, note: 'Hansgrohe', completed: false },
+            { name: 'Elektros apdaila (rozetės, jungikliai, šviestuvai)', category: 'work', startDay: 72, duration: 5, note: '', completed: false },
+            { name: 'Spintos - montavimas', category: 'work', startDay: 77, duration: 5, note: '~4-6 sav po matavimo', completed: false },
+            { name: 'Veidrodžiai - montavimas', category: 'work', startDay: 77, duration: 2, note: '', completed: false },
+            { name: 'Grindjuostės', category: 'work', startDay: 82, duration: 3, note: 'Po spintų!', completed: false },
+            { name: 'Skalbimo mašinos prijungimas', category: 'work', startDay: 77, duration: 1, note: 'Pagalbinė patalpa', completed: false },
+            { name: 'Baigiamieji darbai, valymas', category: 'work', startDay: 85, duration: 7, note: '', completed: false },
+            
+            { type: 'section', name: '✅ JAU UŽSAKYTA / NUPIRKTA' },
+            { name: 'Vallox 099 entalpinis rekuperatorius', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
+            { name: 'Difuzoriai (Ventman)', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
+            { name: 'Alice Ceramica vonios keramika', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
+            { name: 'Hansgrohe maišytuvai', category: 'done', startDay: 0, duration: 1, note: '', completed: true },
+            
+            { type: 'section', name: '⏸️ 2 ETAPAS (vėliau)' },
+            { name: 'Virtuvės baldai - matavimas', category: 'decision', startDay: 92, duration: 1, note: 'Kai bus pinigų', completed: false },
+            { name: 'Virtuvės baldai - gamyba', category: 'delivery', startDay: 93, duration: 30, note: '~4-6 sav', completed: false },
+            { name: 'Virtuvės baldai - montavimas', category: 'work', startDay: 123, duration: 3, note: '', completed: false },
+            { name: 'Buitinė technika', category: 'delivery', startDay: 123, duration: 3, note: 'Orkaitė, kaitlentė, indaplovė', completed: false },
+        ];
+        
+        const categories = {
+            delivery: { name: 'Pristatymas', color: '#27ae60' },
+            decision: { name: 'Sprendimas', color: '#3498db' },
+            work: { name: 'Darbai', color: '#9b59b6' },
+            critical: { name: 'Kritinis', color: '#e74c3c' },
+            warning: { name: 'Dėmesio', color: '#f39c12' },
+            done: { name: 'Atlikta', color: '#1abc9c' }
+        };
+        
+        // ======= TAB SWITCHING =======
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -726,7 +815,28 @@
             if (tab === 'gantt') renderGantt();
         }
         
-        // Editor functions
+        // ======= PROGRESS =======
+        function getProgress() {
+            const realTasks = tasks.filter(t => !t.type);
+            const total = realTasks.length;
+            const completed = realTasks.filter(t => t.completed).length;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            return { total, completed, pct };
+        }
+        
+        function renderProgress(containerId) {
+            const { total, completed, pct } = getProgress();
+            const el = document.getElementById(containerId);
+            el.innerHTML = `
+                <span class="progress-pct">${pct}%</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: ${pct}%;"></div>
+                </div>
+                <span class="progress-text">${completed} iš ${total} užduočių atlikta</span>
+            `;
+        }
+        
+        // ======= EDITOR =======
         function renderEditor() {
             const tbody = document.getElementById('taskTable');
             tbody.innerHTML = '';
@@ -742,22 +852,18 @@
                     e.dataTransfer.setData('text/plain', index);
                     e.dataTransfer.effectAllowed = 'move';
                 });
-                
                 tr.addEventListener('dragend', () => {
                     tr.classList.remove('dragging');
                     document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
                 });
-                
                 tr.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
                     tr.classList.add('drag-over');
                 });
-                
                 tr.addEventListener('dragleave', () => {
                     tr.classList.remove('drag-over');
                 });
-                
                 tr.addEventListener('drop', (e) => {
                     e.preventDefault();
                     tr.classList.remove('drag-over');
@@ -775,8 +881,9 @@
                     tr.className = 'section-row';
                     tr.innerHTML = `
                         <td class="drag-handle">☰</td>
+                        <td></td>
                         <td colspan="5">
-                            <input type="text" value="${task.name}" onchange="updateTask(${index}, 'name', this.value)">
+                            <input type="text" value="${escapeHtml(task.name)}" onchange="updateTask(${index}, 'name', this.value)">
                         </td>
                         <td></td>
                         <td>
@@ -788,10 +895,19 @@
                 } else {
                     const startDate = addDays(projectStart, task.startDay);
                     const endDate = addDays(projectStart, task.startDay + task.duration);
+                    const isCompleted = task.completed;
+                    
+                    if (isCompleted) tr.classList.add('completed-row');
                     
                     tr.innerHTML = `
                         <td class="drag-handle">☰</td>
-                        <td><input type="text" value="${task.name}" onchange="updateTask(${index}, 'name', this.value)"></td>
+                        <td class="done-cell">
+                            <input type="checkbox" class="done-checkbox" 
+                                ${isCompleted ? 'checked' : ''} 
+                                onchange="toggleCompleted(${index}, this.checked)"
+                                title="Pažymėti kaip atliktą">
+                        </td>
+                        <td><input type="text" class="task-name-text" value="${escapeHtml(task.name)}" onchange="updateTask(${index}, 'name', this.value)"></td>
                         <td>
                             <select onchange="updateTask(${index}, 'category', this.value)">
                                 ${Object.entries(categories).map(([key, val]) => 
@@ -802,7 +918,7 @@
                         <td><input type="date" value="${formatDate(startDate)}" onchange="updateTaskDate(${index}, this.value)"></td>
                         <td><input type="number" value="${task.duration}" min="1" class="narrow" onchange="updateTask(${index}, 'duration', parseInt(this.value))"></td>
                         <td style="color: #888;">${formatDate(endDate)}</td>
-                        <td><input type="text" value="${task.note || ''}" onchange="updateTask(${index}, 'note', this.value)" placeholder="Pastaba..."></td>
+                        <td><input type="text" value="${escapeHtml(task.note || '')}" onchange="updateTask(${index}, 'note', this.value)" placeholder="Pastaba..."></td>
                         <td>
                             <div class="row-actions">
                                 <button class="btn btn-danger btn-small" onclick="deleteTask(${index})">🗑️</button>
@@ -813,6 +929,20 @@
                 
                 tbody.appendChild(tr);
             });
+            
+            renderProgress('editor-progress');
+        }
+        
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        function toggleCompleted(index, checked) {
+            tasks[index].completed = checked;
+            saveToStorage();
+            renderEditor();
         }
         
         function updateTask(index, field, value) {
@@ -822,7 +952,7 @@
         }
         
         function updateTaskDate(index, dateStr) {
-            const newDate = new Date(dateStr);
+            const newDate = parseLocalDate(dateStr);
             tasks[index].startDay = daysBetween(projectStart, newDate);
             saveToStorage();
             renderEditor();
@@ -834,7 +964,8 @@
                 category: 'work',
                 startDay: 0,
                 duration: 7,
-                note: ''
+                note: '',
+                completed: false
             });
             saveToStorage();
             renderEditor();
@@ -857,11 +988,11 @@
             }
         }
         
-        // Gantt rendering
+        // ======= GANTT =======
         function renderGantt() {
             const gantt = document.getElementById('gantt');
             const totalDays = 140;
-            const today = new Date();
+            const today = todayLocal();
             
             let html = '';
             
@@ -911,12 +1042,14 @@
                 const startDate = addDays(projectStart, task.startDay);
                 const endDate = addDays(projectStart, task.startDay + task.duration);
                 const dateStr = `${formatDate(startDate)} → ${formatDate(endDate)}`;
+                const isCompleted = task.completed;
                 
                 html += '<div class="task-row">';
-                html += `<div class="task-name ${task.category}">
-                    <div class="task-title">${task.name}</div>
+                html += `<div class="task-name ${task.category}${isCompleted ? ' completed-task' : ''}">
+                    <div class="task-title">${isCompleted ? '✓ ' : ''}${task.name}</div>
                     <div class="task-dates">${dateStr}</div>
-                    ${task.note ? `<div class="task-note">${task.note}</div>` : ''}
+                    ${isCompleted ? '<div class="task-done-badge">✅ Atlikta</div>' : ''}
+                    ${!isCompleted && task.note ? `<div class="task-note">${task.note}</div>` : ''}
                 </div>`;
                 
                 for (let i = 0; i < totalDays; i++) {
@@ -925,7 +1058,7 @@
                     const inRange = i >= task.startDay && i < task.startDay + task.duration;
                     
                     if (inRange) {
-                        let barClass = task.category;
+                        let barClass = isCompleted ? 'completed-bar' : task.category;
                         if (task.duration === 1) barClass += ' single';
                         else if (i === task.startDay) barClass += ' start';
                         else if (i === task.startDay + task.duration - 1) barClass += ' end';
@@ -939,17 +1072,16 @@
             }
             
             gantt.innerHTML = html;
-            
-            // Update summary
             updateSummary();
+            renderProgress('gantt-progress');
         }
         
         function updateSummary() {
             const realTasks = tasks.filter(t => !t.type);
             const maxEnd = Math.max(...realTasks.map(t => t.startDay + t.duration));
             const endDate = addDays(projectStart, maxEnd);
-            const criticalCount = realTasks.filter(t => t.category === 'critical' || t.category === 'warning').length;
-            const doneCount = realTasks.filter(t => t.category === 'done').length;
+            const criticalCount = realTasks.filter(t => !t.completed && (t.category === 'critical' || t.category === 'warning')).length;
+            const { completed } = getProgress();
             
             document.getElementById('summary').innerHTML = `
                 <div class="summary-card">
@@ -969,20 +1101,20 @@
                     <div class="label">Kritiniai</div>
                 </div>
                 <div class="summary-card success">
-                    <div class="number">${doneCount}</div>
-                    <div class="label">Užsakyta</div>
+                    <div class="number">${completed}</div>
+                    <div class="label">Atlikta ✓</div>
                 </div>
             `;
         }
         
         function updateAll() {
             const dateInput = document.getElementById('startDate');
-            projectStart = new Date(dateInput.value);
+            projectStart = parseLocalDate(dateInput.value);
             saveToStorage();
             renderEditor();
         }
         
-        // Export/Import
+        // ======= EXPORT / IMPORT =======
         function exportData() {
             const data = {
                 projectStart: formatDate(projectStart),
@@ -1006,19 +1138,29 @@
         function copyData() {
             const textarea = document.getElementById('modalData');
             textarea.select();
-            document.execCommand('copy');
-            alert('Nukopijuota!');
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                alert('Nukopijuota!');
+            }).catch(() => {
+                document.execCommand('copy');
+                alert('Nukopijuota!');
+            });
         }
         
         function doImport() {
             try {
                 const data = JSON.parse(document.getElementById('modalData').value);
                 if (data.projectStart) {
-                    projectStart = new Date(data.projectStart);
+                    projectStart = parseLocalDate(data.projectStart);
                     document.getElementById('startDate').value = data.projectStart;
                 }
                 if (data.tasks) {
-                    tasks = data.tasks;
+                    // Ensure completed field exists on imported tasks
+                    tasks = data.tasks.map(t => {
+                        if (!t.type && t.completed === undefined) {
+                            t.completed = false;
+                        }
+                        return t;
+                    });
                 }
                 saveToStorage();
                 renderEditor();
@@ -1033,34 +1175,16 @@
             document.getElementById('modal').classList.remove('active');
         }
         
-        // Local storage
+        // ======= STORAGE (in-memory, no localStorage) =======
         function saveToStorage() {
-            const data = {
-                projectStart: formatDate(projectStart),
-                tasks: tasks
-            };
-            localStorage.setItem('renovacija_planas', JSON.stringify(data));
+            // Data lives in memory; export to persist
         }
         
         function loadFromStorage() {
-            const saved = localStorage.getItem('renovacija_planas');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    if (data.projectStart) {
-                        projectStart = new Date(data.projectStart);
-                        document.getElementById('startDate').value = data.projectStart;
-                    }
-                    if (data.tasks) {
-                        tasks = data.tasks;
-                    }
-                } catch (e) {
-                    console.error('Failed to load saved data');
-                }
-            }
+            // No localStorage; uses default data
         }
         
-        // Initialize
+        // ======= INIT =======
         loadFromStorage();
         renderEditor();
         renderGantt();
